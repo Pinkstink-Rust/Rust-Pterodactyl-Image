@@ -65,11 +65,12 @@ console.log("Starting Rust...");
 
 let exited = false;
 const gameProcess = exec(startupCmd);
-gameProcess.stdout.on('data', logToFile);
 gameProcess.stdout.on('data', filter);
-
-gameProcess.stderr.on('data', logToFile);
 gameProcess.stderr.on('data', filter);
+gameProcess.on('error', filter);
+
+child.stdout.pipe(writeStream);
+child.stderr.pipe(writeStream);
 
 gameProcess.on('exit', function (code, signal) {
     exited = true;
