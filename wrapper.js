@@ -69,8 +69,8 @@ gameProcess.stdout.on('data', filter);
 gameProcess.stderr.on('data', filter);
 gameProcess.on('error', filter);
 
-child.stdout.pipe(writeStream);
-child.stderr.pipe(writeStream);
+gameProcess.stdout.pipe(writeStream);
+gameProcess.stderr.pipe(writeStream);
 
 gameProcess.on('exit', function (code, signal) {
     exited = true;
