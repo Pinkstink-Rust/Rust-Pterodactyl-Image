@@ -11,11 +11,6 @@ const logFileName = `logs/RustServer-${Date.now()}.log`;
 let writeStream = fs.createWriteStream(logFileName);
 
 const logToFile = (message) => {
-    if (!writeStream.writable) {
-        writeStream.close()
-        writeStream = fs.createWriteStream(logFileName);
-    }
-
     writeStream.write(message + "\n", (error) => {
         if (error) {
             console.error("Callback error in appendFile", error);
@@ -77,7 +72,6 @@ gameProcess.on('exit', function (code, signal) {
 
     if (code) {
         console.log("Main game process exited with code " + code);
-        logToFile("Main game process exited with code " + code);
         // process.exit(code);
     }
 });
