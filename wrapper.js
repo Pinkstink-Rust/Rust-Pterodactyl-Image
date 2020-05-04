@@ -7,19 +7,7 @@ const WebSocket = require("ws");
 if (!fs.existsSync('logs'))
     fs.mkdirSync('logs');
 
-const logFileName = `logs/RustServer-${Date.now()}.log`;
-let writeStream = fs.createWriteStream(logFileName);
-
-const logToFile = (message) => {
-    writeStream.write(message + "\n", (error) => {
-        if (error) {
-            console.error("Callback error in appendFile", error);
-            err = true;
-        }
-    });
-}
-
-let args = process.argv.splice(process.execArgv.length + 2);
+    let args = process.argv.splice(process.execArgv.length + 2);
 for (let i = 0; i < args.length; i++) {
     if (i === args.length - 1) {
         startupCmd += args[i];
@@ -27,6 +15,8 @@ for (let i = 0; i < args.length; i++) {
         startupCmd += args[i] + " ";
     }
 }
+
+startupCmd += `-logfile "logs/RustServer-${Date.now()}.log"`;
 
 if (startupCmd.length < 1) {
     log("Error: Please specify a startup command.");
@@ -63,9 +53,6 @@ const gameProcess = exec(startupCmd);
 gameProcess.stdout.on('data', filter);
 gameProcess.stderr.on('data', filter);
 gameProcess.on('error', filter);
-
-gameProcess.stdout.pipe(writeStream);
-gameProcess.stderr.pipe(writeStream);
 
 gameProcess.on('exit', function (code, signal) {
     exited = true;
