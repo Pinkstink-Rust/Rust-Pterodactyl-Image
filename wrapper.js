@@ -16,7 +16,7 @@ for (let i = 0; i < args.length; i++) {
     }
 }
 
-startupCmd += `-logfile "logs/RustServer-${Date.now()}.log"`;
+startupCmd += ` -logfile "logs/RustServer-${Date.now()}.log"`;
 
 if (startupCmd.length < 1) {
     log("Error: Please specify a startup command.");
