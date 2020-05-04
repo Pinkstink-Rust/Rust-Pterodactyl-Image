@@ -24,7 +24,6 @@ if (startupCmd.length < 1) {
 }
 
 const seenPercentage = {};
-let serverStarted = false;
 function filter(data) {
     // Prevent filename output spam.
     const str = data.toString().replace(/\(Filename: .*\)[\n]?/g, '').trim();
@@ -36,10 +35,6 @@ function filter(data) {
         if (seenPercentage[percentage]) return;
 
         seenPercentage[percentage] = true;
-    }
-
-    if (str.startsWith("Server startup complete")) {
-        serverStarted = true;
     }
 
     console.log(str);
@@ -118,13 +113,11 @@ const poll = function () {
     });
 
     ws.on("message", function (data, flags) {
-        if (!serverStarted) return;
-
         try {
             let json = JSON.parse(data);
             if (json !== undefined) {
                 if (json.Message !== undefined && json.Message.length > 0) {
-                    if (serverStarted && consoleAttached) detachConsole();
+                    if (consoleAttached) detachConsole();
                     console.log(json.Message);
                 }
             } else {
