@@ -17,7 +17,7 @@ echo ":/home/container$ ${MODIFIED_STARTUP}"
 # OxideMod has been replaced with uMod
 if [ -f OXIDE_FLAG ] || [ "${OXIDE}" = 1 ] || [ "${UMOD}" = 1 ]; then
     echo "Updating uMod..."
-    curl -sSL "https://github.com/Raid-Simulator/Oxide.Rust-RS_Build/releases/latest/download/Oxide.Rust-linux.zip" > umod.zip
+    curl -sSL "https://github.com/Raid-Simulator/Oxide.Rust-RS_Build-Staging/releases/latest/download/Oxide.Rust-linux.zip" > umod.zip
     unzip -o -q umod.zip
     rm umod.zip
     echo "Done updating uMod!"
