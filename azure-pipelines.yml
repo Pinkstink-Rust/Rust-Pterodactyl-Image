@@ -4,7 +4,7 @@
 # https://aka.ms/yaml
 
 trigger:
-- master
+- staging
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -13,7 +13,7 @@ steps:
   - task: Docker@2
     inputs:
       containerRegistry: 'Raid Simulator Docker'
-      repository: 'raidsimulator/rust'
+      repository: 'raidsimulator/rust-staging'
       command: 'buildAndPush'
       Dockerfile: '**/Dockerfile'
       tags: |
