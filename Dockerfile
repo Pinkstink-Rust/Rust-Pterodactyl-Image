@@ -15,4 +15,8 @@ WORKDIR /home/container
 COPY ./entrypoint.sh /entrypoint.sh
 COPY ./Pterodactyl_Rust_Process_Wrapper /Pterodactyl_Rust_Process_Wrapper
 
+USER root
+RUN chmod a+x /Pterodactyl_Rust_Process_Wrapper
+USER container
+
 CMD ["/bin/bash", "/entrypoint.sh"]
