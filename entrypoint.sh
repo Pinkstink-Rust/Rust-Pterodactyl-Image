@@ -30,4 +30,4 @@ mkdir /home/container/tmp
 export DOTNET_BUNDLE_EXTRACT_BASE_DIR="/home/container/tmp"
 
 # Run the Server
-/Pterodactyl_Rust_Process_Wrapper "${MODIFIED_STARTUP}"
+/Pterodactyl_Rust_Process_Wrapper $MODIFIED_STARTUP
