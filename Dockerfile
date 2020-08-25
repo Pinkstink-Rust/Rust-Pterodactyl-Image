@@ -14,5 +14,6 @@ WORKDIR /home/container
 
 COPY ./entrypoint.sh /entrypoint.sh
 COPY ./Pterodactyl_Rust_Process_Wrapper /Pterodactyl_Rust_Process_Wrapper
+RUN ["chmod", "+x", "/Pterodactyl_Rust_Process_Wrapper"]
 
 CMD ["/bin/bash", "/entrypoint.sh"]
