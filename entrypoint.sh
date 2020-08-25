@@ -27,4 +27,4 @@ fi
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)
 
 # Run the Server
-node /wrapper.js "${MODIFIED_STARTUP}"
+/Pterodactyl_Rust_Process_Wrapper "${MODIFIED_STARTUP}"
