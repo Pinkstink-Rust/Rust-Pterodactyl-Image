@@ -26,7 +26,5 @@ fi
 # Fix for Rust not starting
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)
 
-chmod +x /Pterodactyl_Rust_Process_Wrapper
-
 # Run the Server
-/Pterodactyl_Rust_Process_Wrapper "${MODIFIED_STARTUP}"
+exec /Pterodactyl_Rust_Process_Wrapper "${MODIFIED_STARTUP}"
