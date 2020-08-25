@@ -3,8 +3,8 @@ FROM ubuntu:18.04
 LABEL author="Isaac A." maintainer="isaac@isaacs.site"
 
 RUN apt update \
-    # && apt upgrade -y \
-    # && apt install -y lib32gcc1 lib32stdc++6 unzip curl iproute2 libgdiplus \
+    && apt upgrade -y \
+    && apt install -y lib32gcc1 lib32stdc++6 unzip curl iproute2 libgdiplus \
     && useradd -d /home/container -m container
 
 USER container
