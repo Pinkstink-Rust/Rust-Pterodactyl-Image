@@ -25,8 +25,7 @@ fi
 
 # Fix for Rust not starting
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)
-
-ls -la /Pterodactyl_Rust_Process_Wrapper
+export DOTNET_BUNDLE_EXTRACT_BASE_DIR="/tmp"
 
 # Run the Server
 /Pterodactyl_Rust_Process_Wrapper "${MODIFIED_STARTUP}"
