@@ -11,7 +11,7 @@ export INTERNAL_IP=`ip route get 1 | awk '{print $NF;exit}'`
 ./steam/steamcmd.sh +login anonymous +force_install_dir /home/container +app_update 258550 validate +quit
 
 # Replace Startup Variables
-MODIFIED_STARTUP=`echo $(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')`
+MODIFIED_STARTUP=`eval echo $(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g' -e 's/\"/\\\"/g')`
 # echo ":/home/container$ ${MODIFIED_STARTUP}"
 
 # OxideMod has been replaced with uMod
