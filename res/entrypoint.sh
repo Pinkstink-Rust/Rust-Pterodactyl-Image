@@ -4,13 +4,13 @@ cd /home/container
 # Make internal Docker IP address available to processes.
 export INTERNAL_IP=`ip route get 1 | awk '{print $NF;exit}'`
 
-if [ "${STAGING}" = 1 ];
+if [ "${BRANCH}" = 1 ];
 then
-    echo "Updating Staging Branch"
+    echo "Updating ${BRANCH} Branch"
     # Update Rust Server
-    ./steam/steamcmd.sh +login anonymous +force_install_dir /home/container +app_update 258550 -beta staging +quit
+    ./steam/steamcmd.sh +login anonymous +force_install_dir /home/container +app_update 258550 -beta ${BRANCH} +quit
     # Validate Rust Server
-    ./steam/steamcmd.sh +login anonymous +force_install_dir /home/container +app_update 258550 -beta staging validate +quit
+    ./steam/steamcmd.sh +login anonymous +force_install_dir /home/container +app_update 258550 -beta ${BRANCH} validate +quit
 else
     echo "Updating Main Branch"
     # Update Rust Server
