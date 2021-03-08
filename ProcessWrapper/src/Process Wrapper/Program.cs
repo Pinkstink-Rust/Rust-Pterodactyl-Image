@@ -37,7 +37,7 @@ namespace ProcessWrapper
         static Process _rustProcess;
         static readonly ConcurrentStack<Action> _postProcessActions = new ConcurrentStack<Action>();
         static readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-        static readonly string _logFilePath = $"logs/RustServer-{Math.Round((DateTime.Now - DateTime.UnixEpoch).TotalMilliseconds, 0)}.log";
+        static readonly string _logFilePath = $"logs/RustServer-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}.log";
         static readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
@@ -77,20 +77,20 @@ namespace ProcessWrapper
             Environment.Exit(1);
         }
 
-        const string WeeklyWipeFileName = "weekly-wipe-files.json";
-        static void WeeklyWipe()
+        static void MoveFiles(FileInfo fileInfo)
         {
-            if (!File.Exists(WeeklyWipeFileName))
+            if (!fileInfo.Exists)
             {
-                File.WriteAllText(WeeklyWipeFileName, "[]");
-                Console.WriteLine($"File: {WeeklyWipeFileName} was not found, Weekly Wipe routine aborted");
+                File.WriteAllText(fileInfo.FullName, "[]");
+                Console.WriteLine($"File: {fileInfo.FullName} was not found, Move Files routine aborted");
                 return;
             }
 
-            Console.WriteLine("Performing Weekly Wipe routine");
-            var fileBytes = File.ReadAllBytes(WeeklyWipeFileName);
+            Console.WriteLine("Performing Move Files routine");
+            var fileBytes = File.ReadAllBytes(fileInfo.FullName);
             var directories = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(fileBytes);
-            var backupDirectory = Path.Join(Directory.GetCurrentDirectory(), "weekly-wipe-backups", Math.Round((DateTime.Now - DateTime.UnixEpoch).TotalMilliseconds, 0).ToString());
+            var backupDirectoryName = Path.GetFileNameWithoutExtension(fileInfo.Name);
+            var backupDirectory = Path.Join(Directory.GetCurrentDirectory(), backupDirectoryName, Math.Round((DateTime.Now - DateTime.UnixEpoch).TotalMilliseconds, 0).ToString());
             if (!Directory.Exists(backupDirectory)) Directory.CreateDirectory(backupDirectory);
             foreach (var directory in directories)
             {
@@ -136,65 +136,6 @@ namespace ProcessWrapper
             }
         }
 
-        const string ForcedWipeFileName = "forced-wipe-files.json";
-        static void ForcedWipe()
-        {
-            if (!File.Exists(ForcedWipeFileName))
-            {
-                File.WriteAllText(ForcedWipeFileName, "[]");
-                Console.WriteLine($"File: {ForcedWipeFileName} was not found, Forced Wipe routine aborted");
-                return;
-            }
-
-            Console.WriteLine("Performing Forced Wipe routine");
-            var fileBytes = File.ReadAllBytes(ForcedWipeFileName);
-            var directories = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(fileBytes);
-            var backupDirectory = Path.Join(Directory.GetCurrentDirectory(), "forced-wipe-backups", Math.Round((DateTime.Now - DateTime.UnixEpoch).TotalMilliseconds, 0).ToString());
-            if (!Directory.Exists(backupDirectory)) Directory.CreateDirectory(backupDirectory);
-            foreach (var directory in directories)
-            {
-                if (!Directory.Exists(directory.Key))
-                {
-                    Console.WriteLine($"Directory not found: {directory.Key}");
-                    continue;
-                }
-
-                var files = directory.Value;
-                foreach (var file in files)
-                {
-                    var filesInDirectory = Directory.EnumerateFiles(directory.Key, file);
-                    if (filesInDirectory.Count() < 1)
-                    {
-                        Console.WriteLine($"Failed to find any files matching the pattern \"{file}\" within \"{directory.Key}\"");
-                        continue;
-                    }
-
-                    foreach (var filePath in filesInDirectory)
-                    {
-                        if (!File.Exists(filePath))
-                        {
-                            Console.WriteLine($"File does not exist: {filePath}");
-                            continue;
-                        }
-
-                        try
-                        {
-                            var fileName = Path.GetFileName(filePath);
-                            var destinationPath = Path.Join(backupDirectory, directory.Key, fileName);
-                            var dirInfo = Directory.GetParent(destinationPath);
-                            if (!dirInfo.Exists) dirInfo.Create();
-                            File.Move(filePath, destinationPath);
-                            Console.WriteLine($"Wiped: {filePath}");
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Failed to delete: {filePath}\nError: {ex.Message}");
-                        }
-                    }
-                }
-            }
-        }
-
         static Task<string> ReadInput()
         {
             return Task.Run(() =>
@@ -215,27 +156,19 @@ namespace ProcessWrapper
                 if (!commandTask.IsCompleted) continue;
                 string command = commandTask.Result;
 
-                if (command == "__weekly_wipe")
+                if (command.StartsWith("__move-files"))
                 {
-                    if (_postProcessActions.Contains(WeeklyWipe))
+                    command = command.Replace("__move-files", string.Empty).Trim();
+                    if (string.IsNullOrWhiteSpace(command)) return;
+                    var fileInfo = new FileInfo(command);
+                    if (!fileInfo.Exists)
                     {
-                        Console.WriteLine("Weekly Wipe already queued for next server shutdown");
-                        continue;
+                        Console.WriteLine($"Failed to find a file at location: {fileInfo.FullName}");
+                        return;
                     }
-                    Console.WriteLine("Weekly Wipe queued for next server shutdown");
-                    _postProcessActions.Push(WeeklyWipe);
-                    continue;
-                }
 
-                if (command == "__forced_wipe")
-                {
-                    if (_postProcessActions.Contains(ForcedWipe))
-                    {
-                        Console.WriteLine("Forced Wipe already queued for next server shutdown");
-                        continue;
-                    }
-                    Console.WriteLine("Forced Wipe queued for next server shutdown");
-                    _postProcessActions.Push(ForcedWipe);
+                    Console.WriteLine("Moving of Files queued for next server shutdown");
+                    _postProcessActions.Push(() => MoveFiles(fileInfo));
                     continue;
                 }
 
