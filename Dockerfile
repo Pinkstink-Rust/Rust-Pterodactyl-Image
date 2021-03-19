@@ -13,10 +13,10 @@ ENV  USER=container HOME=/home/container
 WORKDIR /home/container
 
 COPY ./res/entrypoint.sh /entrypoint.sh
-COPY ./res/RustProcessWrapper /RustProcessWrapper
+COPY ./res/ProcessWrapper /ProcessWrapper
 
 USER root
-RUN chmod a+x /RustProcessWrapper
+RUN chmod a+x /ProcessWrapper
 USER container
 
 CMD ["/bin/bash", "/entrypoint.sh"]
