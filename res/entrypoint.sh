@@ -8,7 +8,7 @@ if [ ! -f ./steam/steamcmd.sh ]; then
     echo "Downloading SteamCMD"
     curl -sSL -o ./steamcmd.tar.gz http://media.steampowered.com/installer/steamcmd_linux.tar.gz
     mkdir -p ./steam
-    tar -xzvf steamcmd.tar.gz -C ./steam
+    tar -xzf steamcmd.tar.gz -C ./steam
     rm ./steamcmd.tar.gz
 fi
 
