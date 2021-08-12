@@ -24,12 +24,15 @@ MODIFIED_STARTUP=`eval echo $(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g'
 
 # OxideMod has been replaced with uMod
 if [ ! -z "${OXIDE_URL}" ]; then
-    echo "Updating uMod..."
-    curl -sSL "${OXIDE_URL}" >umod.zip
-    unzip -o -q umod.zip
-    rm umod.zip
-    echo "Done updating uMod!"
+    echo "Updating Oxide..."
+    curl -sSL "${OXIDE_URL}" >oxide.zip
+    unzip -o -q oxide.zip
+    rm oxide.zip
+    echo "Done updating Oxide!"
 fi
+
+echo "Disabling Oxide Sandbox"
+touch RustDedicated_Data/Managed/oxide.disable-sandbox
 
 # Fix for Rust not starting
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)
@@ -37,5 +40,6 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)
 mkdir -p /home/container/tmp
 export DOTNET_BUNDLE_EXTRACT_BASE_DIR="/home/container/tmp"
 
+echo "Starting Rust Server"
 # Run the Server
 /ProcessWrapper $MODIFIED_STARTUP
