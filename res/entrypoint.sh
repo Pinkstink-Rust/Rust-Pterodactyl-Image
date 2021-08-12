@@ -4,6 +4,14 @@ cd /home/container
 # Make internal Docker IP address available to processes.
 export INTERNAL_IP=`ip route get 1 | awk '{print $NF;exit}'`
 
+if [ ! -f ./steam/steamcmd.sh ]; then
+    echo "Downloading SteamCMD"
+    curl -sSL -o ./steamcmd.tar.gz http://media.steampowered.com/installer/steamcmd_linux.tar.gz
+    mkdir -p ./steam
+    tar -xzvf steamcmd.tar.gz -C ./steam
+    rm ./steamcmd.tar.gz
+fi
+
 if [ ! -z "${BRANCH}" ];
 then
     echo "Updating ${BRANCH} Branch"
@@ -28,11 +36,9 @@ if [ ! -z "${OXIDE_URL}" ]; then
     curl -sSL "${OXIDE_URL}" >oxide.zip
     unzip -o -q oxide.zip
     rm oxide.zip
-    echo "Done updating Oxide!"
+    echo "Disabling Oxide Sandbox"
+    touch RustDedicated_Data/Managed/oxide.disable-sandbox
 fi
-
-echo "Disabling Oxide Sandbox"
-touch RustDedicated_Data/Managed/oxide.disable-sandbox
 
 # Fix for Rust not starting
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)
